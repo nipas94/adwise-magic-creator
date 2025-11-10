@@ -11,38 +11,28 @@ const Index = () => {
     setIsLoading(true);
     
     try {
-      // Placeholder for API call - will be implemented with Lovable Cloud
-      // const response = await fetch('/api/generate', {
-      //   method: 'POST',
-      //   body: formData,
-      // });
-      // const data = await response.json();
-      // setResult(data.result);
-      
-      // Mock response for now
-      setTimeout(() => {
-        setResult({
-          captions: [
-            "Discover the art of coffee at our boutique café ☕✨ Every cup tells a story of craftsmanship and passion.",
-            "Artisanal coffee, crafted with love in the heart of Bangalore 🌟 Your perfect cup awaits!",
-            "Where coffee meets creativity ☕🎨 Experience the difference of truly artisanal brews."
-          ],
-          tagline: "Brewing Excellence, One Cup at a Time",
-          faqs: [
-            {
-              q: "What makes your coffee artisanal?",
-              a: "We source premium beans, roast in small batches, and craft each cup with precision and care."
-            },
-            {
-              q: "Where are you located?",
-              a: "We're nestled in the heart of Bangalore, creating a cozy space for coffee lovers."
-            }
-          ]
-        });
-        setIsLoading(false);
-      }, 2000);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate content');
+      }
+
+      const data = await response.json();
+      setResult(data.result);
     } catch (error) {
       console.error('Error generating content:', error);
+      alert(error instanceof Error ? error.message : 'Failed to generate content. Please try again.');
+    } finally {
       setIsLoading(false);
     }
   };
