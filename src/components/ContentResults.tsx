@@ -14,9 +14,10 @@ interface ContentResultsProps {
   onTryAgain: () => void;
   onRegenerateSection: (section: 'captions' | 'tagline' | 'faqs') => void;
   regeneratingSection: string | null;
+  photoContext?: string;
 }
 
-export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regeneratingSection }: ContentResultsProps) => {
+export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regeneratingSection, photoContext }: ContentResultsProps) => {
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -47,18 +48,25 @@ export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regene
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Your content is ready ✨</h2>
-        <div className="flex gap-2">
-          <Button onClick={copyAll} variant="outline" size="sm">
-            <Copy className="mr-2 h-4 w-4" />
-            Copy All
-          </Button>
-          <Button onClick={onTryAgain} variant="outline" size="sm">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Try Again
-          </Button>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Your content is ready ✨</h2>
+          <div className="flex gap-2">
+            <Button onClick={copyAll} variant="outline" size="sm">
+              <Copy className="mr-2 h-4 w-4" />
+              Copy All
+            </Button>
+            <Button onClick={onTryAgain} variant="outline" size="sm">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try Again
+            </Button>
+          </div>
         </div>
+        {photoContext && (
+          <p className="text-sm text-muted-foreground">
+            Detected from your photo: {photoContext}
+          </p>
+        )}
       </div>
 
       {result.captions.length > 0 && (

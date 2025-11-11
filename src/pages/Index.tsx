@@ -8,6 +8,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [regeneratingSection, setRegeneratingSection] = useState<string | null>(null);
   const [lastFormData, setLastFormData] = useState<FormData | null>(null);
+  const [photoContext, setPhotoContext] = useState<string>('');
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
@@ -32,6 +33,7 @@ const Index = () => {
 
       const data = await response.json();
       setResult(data.result);
+      setPhotoContext(data.photoContext || '');
     } catch (error) {
       console.error('Error generating content:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate content. Please try again.';
@@ -50,6 +52,7 @@ const Index = () => {
 
   const handleTryAgain = () => {
     setResult(null);
+    setPhotoContext('');
   };
 
   const handleRegenerateSection = async (section: 'captions' | 'tagline' | 'faqs') => {
@@ -142,6 +145,7 @@ const Index = () => {
                 onTryAgain={handleTryAgain}
                 onRegenerateSection={handleRegenerateSection}
                 regeneratingSection={regeneratingSection}
+                photoContext={photoContext}
               />
             )}
           </div>

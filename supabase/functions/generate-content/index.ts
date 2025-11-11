@@ -28,7 +28,48 @@ serve(async (req) => {
     // Build the prompt based on content type and section
     let systemPrompt = `You are an expert marketing copywriter. Generate compelling, professional content in a ${tone} tone.`;
     
+    // First, analyze the photo if provided (only on initial generation, not section regeneration)
+    let photoContext = '';
+    if (photo && !section) {
+      const photoBytes = await photo.arrayBuffer();
+      const photoBase64 = btoa(String.fromCharCode(...new Uint8Array(photoBytes)));
+      
+      const photoAnalysisResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { 
+              role: 'user', 
+              content: [
+                { type: 'text', text: 'Describe what you see in this image in one short sentence (max 60 characters). Focus on the main subject or theme.' },
+                { 
+                  type: 'image_url', 
+                  image_url: { url: `data:${photo.type};base64,${photoBase64}` }
+                }
+              ]
+            }
+          ],
+          temperature: 0.7,
+        }),
+      });
+
+      if (photoAnalysisResponse.ok) {
+        const photoData = await photoAnalysisResponse.json();
+        photoContext = photoData.choices[0].message.content.trim();
+        console.log('Photo analysis:', photoContext);
+      }
+    }
+
     let userPrompt = `Business Description: ${business}\n\n`;
+    
+    if (photoContext) {
+      userPrompt += `Photo Context: ${photoContext}\n\n`;
+    }
     
     // If section is specified, only generate that section
     if (section === 'captions' || (!section && (contentType === 'all' || contentType === 'social'))) {
@@ -114,7 +155,7 @@ If a content type wasn't requested, return empty arrays/strings for that section
     console.log('Parsed result:', result);
 
     return new Response(
-      JSON.stringify({ result }),
+      JSON.stringify({ result, photoContext: photoContext || undefined }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
