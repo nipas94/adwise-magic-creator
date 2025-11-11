@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Copy, RefreshCw, Check } from "lucide-react";
+import { Copy, RefreshCw, Check, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,9 +12,11 @@ interface ContentResult {
 interface ContentResultsProps {
   result: ContentResult;
   onTryAgain: () => void;
+  onRegenerateSection: (section: 'captions' | 'tagline' | 'faqs') => void;
+  regeneratingSection: string | null;
 }
 
-export const ContentResults = ({ result, onTryAgain }: ContentResultsProps) => {
+export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regeneratingSection }: ContentResultsProps) => {
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -61,7 +63,27 @@ export const ContentResults = ({ result, onTryAgain }: ContentResultsProps) => {
 
       {result.captions.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Social Media Captions</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Social Media Captions</h3>
+            <Button
+              onClick={() => onRegenerateSection('captions')}
+              disabled={regeneratingSection === 'captions'}
+              variant="outline"
+              size="sm"
+            >
+              {regeneratingSection === 'captions' ? (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+                  Regenerating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Regenerate
+                </>
+              )}
+            </Button>
+          </div>
           {result.captions.map((caption, idx) => (
             <div
               key={idx}
@@ -89,7 +111,27 @@ export const ContentResults = ({ result, onTryAgain }: ContentResultsProps) => {
 
       {result.tagline && (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Brand Tagline</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Brand Tagline</h3>
+            <Button
+              onClick={() => onRegenerateSection('tagline')}
+              disabled={regeneratingSection === 'tagline'}
+              variant="outline"
+              size="sm"
+            >
+              {regeneratingSection === 'tagline' ? (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+                  Regenerating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Regenerate
+                </>
+              )}
+            </Button>
+          </div>
           <div className="p-4 bg-gradient-primary rounded-lg shadow-glow group">
             <div className="flex items-start justify-between gap-3">
               <p className="flex-1 text-sm leading-relaxed text-primary-foreground font-medium">
@@ -114,7 +156,27 @@ export const ContentResults = ({ result, onTryAgain }: ContentResultsProps) => {
 
       {result.faqs.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Frequently Asked Questions</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Frequently Asked Questions</h3>
+            <Button
+              onClick={() => onRegenerateSection('faqs')}
+              disabled={regeneratingSection === 'faqs'}
+              variant="outline"
+              size="sm"
+            >
+              {regeneratingSection === 'faqs' ? (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+                  Regenerating...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Regenerate
+                </>
+              )}
+            </Button>
+          </div>
           {result.faqs.map((faq, idx) => (
             <div
               key={idx}

@@ -15,29 +15,31 @@ serve(async (req) => {
     const business = formData.get('business') as string;
     const contentType = formData.get('contentType') as string;
     const tone = formData.get('tone') as string;
+    const section = formData.get('section') as string | null; // Optional: 'captions', 'tagline', 'faqs'
     const photo = formData.get('photo') as File | null;
 
-    console.log('Generating content for:', { business, contentType, tone, hasPhoto: !!photo });
+    console.log('Generating content for:', { business, contentType, tone, section, hasPhoto: !!photo });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Build the prompt based on content type
+    // Build the prompt based on content type and section
     let systemPrompt = `You are an expert marketing copywriter. Generate compelling, professional content in a ${tone} tone.`;
     
     let userPrompt = `Business Description: ${business}\n\n`;
     
-    if (contentType === 'all' || contentType === 'social') {
+    // If section is specified, only generate that section
+    if (section === 'captions' || (!section && (contentType === 'all' || contentType === 'social'))) {
       userPrompt += `Generate 3 engaging social media captions (each 100-150 characters) that would work well for Instagram, Facebook, or LinkedIn.\n\n`;
     }
     
-    if (contentType === 'all' || contentType === 'marketing') {
+    if (section === 'tagline' || (!section && (contentType === 'all' || contentType === 'marketing'))) {
       userPrompt += `Create a memorable tagline (max 60 characters) that captures the essence of this business.\n\n`;
     }
     
-    if (contentType === 'all' || contentType === 'faqs') {
+    if (section === 'faqs' || (!section && (contentType === 'all' || contentType === 'faqs'))) {
       userPrompt += `Generate 2-3 frequently asked questions with clear, helpful answers.\n\n`;
     }
 

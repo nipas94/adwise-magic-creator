@@ -6,9 +6,12 @@ import { Sparkles } from "lucide-react";
 const Index = () => {
   const [result, setResult] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [regeneratingSection, setRegeneratingSection] = useState<string | null>(null);
+  const [lastFormData, setLastFormData] = useState<FormData | null>(null);
 
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
+    setLastFormData(formData); // Store for regeneration
     
     try {
       const response = await fetch(
@@ -49,6 +52,62 @@ const Index = () => {
     setResult(null);
   };
 
+  const handleRegenerateSection = async (section: 'captions' | 'tagline' | 'faqs') => {
+    if (!lastFormData) return;
+    
+    setRegeneratingSection(section);
+    
+    try {
+      // Create new FormData with section parameter
+      const regenerateData = new FormData();
+      regenerateData.append('business', lastFormData.get('business') as string);
+      regenerateData.append('contentType', lastFormData.get('contentType') as string);
+      regenerateData.append('tone', lastFormData.get('tone') as string);
+      regenerateData.append('section', section);
+      
+      const photo = lastFormData.get('photo');
+      if (photo) {
+        regenerateData.append('photo', photo);
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-content`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: regenerateData,
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to regenerate content');
+      }
+
+      const data = await response.json();
+      
+      // Merge the regenerated section with existing result
+      setResult((prevResult: any) => ({
+        ...prevResult,
+        ...data.result,
+      }));
+    } catch (error) {
+      console.error('Error regenerating section:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to regenerate. Please try again.';
+      import('@/hooks/use-toast').then(({ toast }) => {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      });
+    } finally {
+      setRegeneratingSection(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <div className="container mx-auto px-4 py-12">
@@ -78,7 +137,12 @@ const Index = () => {
               <ContentForm onSubmit={handleSubmit} isLoading={isLoading} />
             )}
             {result && !isLoading && (
-              <ContentResults result={result} onTryAgain={handleTryAgain} />
+              <ContentResults 
+                result={result} 
+                onTryAgain={handleTryAgain}
+                onRegenerateSection={handleRegenerateSection}
+                regeneratingSection={regeneratingSection}
+              />
             )}
           </div>
 
