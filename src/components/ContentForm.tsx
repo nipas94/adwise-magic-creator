@@ -62,7 +62,7 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
         <Label htmlFor="business">Describe your business</Label>
         <Textarea
           id="business"
-          placeholder="e.g., I run a boutique café in Bangalore serving artisanal coffee"
+          placeholder="e.g., I run a handmade jewelry brand in Jaipur focusing on elegant festive collections."
           value={business}
           onChange={(e) => setBusiness(e.target.value)}
           className="min-h-[120px] resize-none"
@@ -77,7 +77,7 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All (Captions, Tagline, FAQs)</SelectItem>
               <SelectItem value="marketing">Marketing Copy</SelectItem>
               <SelectItem value="faqs">FAQs</SelectItem>
               <SelectItem value="social">Social Posts</SelectItem>
@@ -94,8 +94,8 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
             <SelectContent>
               <SelectItem value="friendly">Friendly</SelectItem>
               <SelectItem value="formal">Formal</SelectItem>
-              <SelectItem value="playful">Playful</SelectItem>
               <SelectItem value="elegant">Elegant</SelectItem>
+              <SelectItem value="playful">Playful</SelectItem>
             </SelectContent>
           </Select>
         </div>

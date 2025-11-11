@@ -31,7 +31,15 @@ const Index = () => {
       setResult(data.result);
     } catch (error) {
       console.error('Error generating content:', error);
-      alert(error instanceof Error ? error.message : 'Failed to generate content. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate content. Please try again.';
+      // Show error toast instead of alert
+      import('@/hooks/use-toast').then(({ toast }) => {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      });
     } finally {
       setIsLoading(false);
     }
@@ -61,9 +69,15 @@ const Index = () => {
 
           {/* Main Content */}
           <div className="bg-card rounded-2xl shadow-elegant p-8 md:p-10">
-            {!result ? (
+            {isLoading && (
+              <div className="text-center py-8">
+                <p className="text-lg text-muted-foreground">Crafting your content…</p>
+              </div>
+            )}
+            {!result && !isLoading && (
               <ContentForm onSubmit={handleSubmit} isLoading={isLoading} />
-            ) : (
+            )}
+            {result && !isLoading && (
               <ContentResults result={result} onTryAgain={handleTryAgain} />
             )}
           </div>

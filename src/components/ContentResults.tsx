@@ -22,8 +22,7 @@ export const ContentResults = ({ result, onTryAgain }: ContentResultsProps) => {
     await navigator.clipboard.writeText(text);
     setCopiedIndex(id);
     toast({
-      title: "Copied! ✅",
-      description: "Text copied to clipboard",
+      title: "Copied ✅",
     });
     setTimeout(() => setCopiedIndex(null), 2000);
   };
@@ -40,8 +39,7 @@ export const ContentResults = ({ result, onTryAgain }: ContentResultsProps) => {
     
     await navigator.clipboard.writeText(allContent);
     toast({
-      title: "Copied! ✅",
-      description: "All content copied to clipboard",
+      title: "Copied ✅",
     });
   };
 
