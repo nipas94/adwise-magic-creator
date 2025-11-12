@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ContentForm } from "@/components/ContentForm";
 import { ContentResults } from "@/components/ContentResults";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Brain, Zap } from "lucide-react";
 
 const Index = () => {
   const [result, setResult] = useState<any>(null);
@@ -121,9 +121,21 @@ const Index = () => {
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium text-primary">AI-Powered Content Generation</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              AdWise AI
-            </h1>
+            
+            {/* Logo */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-primary blur-xl opacity-50"></div>
+                <div className="relative bg-gradient-primary p-3 rounded-2xl shadow-elegant">
+                  <Brain className="h-10 w-10 text-white" strokeWidth={2.5} />
+                  <Zap className="h-5 w-5 text-yellow-300 absolute -top-1 -right-1" />
+                </div>
+              </div>
+              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                AdWise AI
+              </h1>
+            </div>
+            
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Write smarter. Post faster. Grow bigger.
             </p>
