@@ -60,7 +60,15 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
     friendly: "Hey! 👋 Check out our amazing handmade jewelry collection. Each piece is crafted with love and care just for you!",
     formal: "We are pleased to present our distinguished handmade jewelry collection. Each piece represents exceptional craftsmanship and timeless elegance.",
     elegant: "Discover the refined beauty of our handmade jewelry collection. Exquisitely crafted pieces that embody sophistication and grace.",
-    playful: "Sparkle and shine! ✨💎 Our fun handmade jewelry collection is here to add some extra pizzazz to your style!"
+    playful: "Sparkle and shine! ✨💎 Our fun handmade jewelry collection is here to add some extra pizzazz to your style!",
+    minimal: "Handmade jewelry. Quality craftsmanship. Simple elegance.",
+    traditional: "Our time-honored handmade jewelry collection celebrates classic craftsmanship and enduring beauty passed down through generations.",
+    bold: "STAND OUT. Our handmade jewelry makes a STATEMENT. Designed for those who dare to be different and own their style!",
+    sincere: "From our hands to yours—each piece of jewelry is thoughtfully crafted with genuine care and authentic passion for our craft.",
+    inspirational: "Wear your dreams. Our handmade jewelry empowers you to express your unique journey and shine as the remarkable person you are.",
+    luxurious: "Indulge in the opulence of our handmade jewelry collection. Each exquisite piece radiates prestige and unparalleled refinement.",
+    casual: "Easy-going jewelry for everyday wear. Handmade pieces that fit your laid-back lifestyle perfectly.",
+    purpose: "Every piece we create serves a greater mission—supporting artisan communities and sustainable practices while delivering beautiful handmade jewelry."
   };
 
   return (
@@ -98,11 +106,19 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
             <SelectTrigger id="tone">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover z-50">
               <SelectItem value="friendly">Friendly</SelectItem>
               <SelectItem value="formal">Formal</SelectItem>
               <SelectItem value="elegant">Elegant</SelectItem>
               <SelectItem value="playful">Playful</SelectItem>
+              <SelectItem value="minimal">Minimal</SelectItem>
+              <SelectItem value="traditional">Traditional</SelectItem>
+              <SelectItem value="bold">Bold</SelectItem>
+              <SelectItem value="sincere">Sincere</SelectItem>
+              <SelectItem value="inspirational">Inspirational</SelectItem>
+              <SelectItem value="luxurious">Luxurious</SelectItem>
+              <SelectItem value="casual">Casual</SelectItem>
+              <SelectItem value="purpose">Purpose-driven</SelectItem>
             </SelectContent>
           </Select>
         </div>
