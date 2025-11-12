@@ -72,7 +72,7 @@ export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regene
       {result.captions.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Social Media Captions</h3>
+            <h3 className="text-lg font-semibold">Social Media Captions 📱</h3>
             <Button
               onClick={() => onRegenerateSection('captions')}
               disabled={regeneratingSection === 'captions'}
@@ -120,7 +120,7 @@ export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regene
       {result.tagline && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Brand Tagline</h3>
+            <h3 className="text-lg font-semibold">Brand Tagline ✨</h3>
             <Button
               onClick={() => onRegenerateSection('tagline')}
               disabled={regeneratingSection === 'tagline'}
@@ -165,7 +165,7 @@ export const ContentResults = ({ result, onTryAgain, onRegenerateSection, regene
       {result.faqs.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Frequently Asked Questions</h3>
+            <h3 className="text-lg font-semibold">Frequently Asked Questions ❓</h3>
             <Button
               onClick={() => onRegenerateSection('faqs')}
               disabled={regeneratingSection === 'faqs'}
