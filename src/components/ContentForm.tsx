@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Upload, Sparkles } from "lucide-react";
+import { Upload, Sparkles, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ContentFormProps {
@@ -56,6 +56,13 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
     }
   };
 
+  const toneExamples = {
+    friendly: "Hey! 👋 Check out our amazing handmade jewelry collection. Each piece is crafted with love and care just for you!",
+    formal: "We are pleased to present our distinguished handmade jewelry collection. Each piece represents exceptional craftsmanship and timeless elegance.",
+    elegant: "Discover the refined beauty of our handmade jewelry collection. Exquisitely crafted pieces that embody sophistication and grace.",
+    playful: "Sparkle and shine! ✨💎 Our fun handmade jewelry collection is here to add some extra pizzazz to your style!"
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
@@ -99,6 +106,16 @@ export const ContentForm = ({ onSubmit, isLoading }: ContentFormProps) => {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      <div className="p-4 bg-muted/50 rounded-lg border border-border">
+        <div className="flex items-start gap-2 mb-2">
+          <MessageSquare className="h-4 w-4 text-primary mt-0.5" />
+          <Label className="text-sm font-medium">Tone Preview</Label>
+        </div>
+        <p className="text-sm text-muted-foreground italic">
+          {toneExamples[tone as keyof typeof toneExamples]}
+        </p>
       </div>
 
       <div className="space-y-2">
