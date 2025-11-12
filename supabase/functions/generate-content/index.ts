@@ -32,7 +32,16 @@ serve(async (req) => {
     let photoContext = '';
     if (photo && !section) {
       const photoBytes = await photo.arrayBuffer();
-      const photoBase64 = btoa(String.fromCharCode(...new Uint8Array(photoBytes)));
+      const uint8Array = new Uint8Array(photoBytes);
+      
+      // Convert to base64 in chunks to avoid stack overflow
+      let binary = '';
+      const chunkSize = 8192;
+      for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.subarray(i, i + chunkSize);
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+      const photoBase64 = btoa(binary);
       
       const photoAnalysisResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
