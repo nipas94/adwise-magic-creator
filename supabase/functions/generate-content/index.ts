@@ -17,6 +17,7 @@ serve(async (req) => {
     const tone = formData.get('tone') as string;
     const section = formData.get('section') as string | null; // Optional: 'captions', 'tagline', 'faqs'
     const photo = formData.get('photo') as File | null;
+    const photoContext = formData.get('photoContext') as string | null; // For weekly generation
 
     console.log('Generating content for:', { business, contentType, tone, section, hasPhoto: !!photo });
 
@@ -29,8 +30,8 @@ serve(async (req) => {
     let systemPrompt = `You are an expert marketing copywriter. Generate compelling, professional content in a ${tone} tone.`;
     
     // First, analyze the photo if provided (only on initial generation, not section regeneration)
-    let photoContext = '';
-    if (photo && !section) {
+    let analyzedPhotoContext = photoContext || '';
+    if (photo && !section && contentType !== 'weekly') {
       const photoBytes = await photo.arrayBuffer();
       const uint8Array = new Uint8Array(photoBytes);
       
@@ -69,15 +70,102 @@ serve(async (req) => {
 
       if (photoAnalysisResponse.ok) {
         const photoData = await photoAnalysisResponse.json();
-        photoContext = photoData.choices[0].message.content.trim();
-        console.log('Photo analysis:', photoContext);
+        analyzedPhotoContext = photoData.choices[0].message.content.trim();
+        console.log('Photo analysis:', analyzedPhotoContext);
       }
+    }
+
+    // Handle weekly content generation
+    if (contentType === 'weekly') {
+      let weeklyPrompt = `Business Description: ${business}\n\n`;
+      
+      if (analyzedPhotoContext) {
+        weeklyPrompt += `Photo Context: ${analyzedPhotoContext}\n\n`;
+      }
+      
+      weeklyPrompt += `Generate a full week of social media content (7 days, Monday to Sunday) with a strategic mix:
+
+- Monday, Wednesday, Friday: ACQUISITION POSTS - Designed to attract new customers. These should highlight value propositions, showcase products/services, include special offers, or demonstrate expertise. Focus on discovery and conversion.
+
+- Tuesday, Thursday, Saturday, Sunday: ENGAGEMENT POSTS - Designed to nurture existing followers. These should build community through questions, share behind-the-scenes content, celebrate customers, share tips/advice, or tell brand stories. Focus on relationships and loyalty.
+
+Each post should:
+- Be 100-150 characters
+- Match the ${tone} tone
+- Be platform-ready (Instagram/Facebook/LinkedIn)
+- Include relevant context from the business
+
+Return the response in the following JSON format:
+{
+  "weeklyContent": [
+    {"day": "Monday", "type": "acquire", "caption": "caption text"},
+    {"day": "Tuesday", "type": "engage", "caption": "caption text"},
+    {"day": "Wednesday", "type": "acquire", "caption": "caption text"},
+    {"day": "Thursday", "type": "engage", "caption": "caption text"},
+    {"day": "Friday", "type": "acquire", "caption": "caption text"},
+    {"day": "Saturday", "type": "engage", "caption": "caption text"},
+    {"day": "Sunday", "type": "engage", "caption": "caption text"}
+  ]
+}`;
+
+      const weeklyResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: weeklyPrompt }
+          ],
+          temperature: 0.8,
+        }),
+      });
+
+      if (!weeklyResponse.ok) {
+        if (weeklyResponse.status === 429) {
+          return new Response(
+            JSON.stringify({ error: 'Rate limits exceeded. Please try again later.' }),
+            { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        if (weeklyResponse.status === 402) {
+          return new Response(
+            JSON.stringify({ error: 'AI credits depleted. Please add credits to continue.' }),
+            { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        throw new Error(`AI gateway error: ${weeklyResponse.status}`);
+      }
+
+      const weeklyData = await weeklyResponse.json();
+      const weeklyContent = weeklyData.choices[0].message.content;
+      
+      let weeklyResult;
+      try {
+        const jsonMatch = weeklyContent.match(/```json\s*([\s\S]*?)\s*```/) || weeklyContent.match(/```\s*([\s\S]*?)\s*```/);
+        const jsonString = jsonMatch ? jsonMatch[1] : weeklyContent;
+        weeklyResult = JSON.parse(jsonString);
+      } catch (parseError) {
+        console.error('Failed to parse weekly content:', parseError);
+        weeklyResult = { weeklyContent: [] };
+      }
+
+      return new Response(
+        JSON.stringify({ result: weeklyResult }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      );
     }
 
     let userPrompt = `Business Description: ${business}\n\n`;
     
-    if (photoContext) {
-      userPrompt += `Photo Context: ${photoContext}\n\n`;
+    if (analyzedPhotoContext) {
+      userPrompt += `Photo Context: ${analyzedPhotoContext}\n\n`;
     }
     
     // If section is specified, only generate that section
@@ -164,7 +252,7 @@ If a content type wasn't requested, return empty arrays/strings for that section
     console.log('Parsed result:', result);
 
     return new Response(
-      JSON.stringify({ result, photoContext: photoContext || undefined }),
+      JSON.stringify({ result, photoContext: analyzedPhotoContext || undefined }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200 
