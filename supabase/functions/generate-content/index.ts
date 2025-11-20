@@ -19,6 +19,52 @@ serve(async (req) => {
     const photo = formData.get('photo') as File | null;
     const photoContext = formData.get('photoContext') as string | null; // For weekly generation
 
+    // Validate inputs
+    if (!business || typeof business !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Business description required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (business.length > 2000) {
+      return new Response(
+        JSON.stringify({ error: 'Business description too long (max 2000 chars)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (business.trim().length < 10) {
+      return new Response(
+        JSON.stringify({ error: 'Business description too short (min 10 chars)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const validTones = ['friendly', 'formal', 'elegant', 'playful', 'minimal', 'traditional', 'bold', 'sincere', 'inspirational', 'luxurious', 'casual', 'purpose'];
+    if (!validTones.includes(tone)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid tone selected' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const validContentTypes = ['all', 'social', 'marketing', 'faqs', 'weekly'];
+    if (!validContentTypes.includes(contentType)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid content type' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate photo size if provided
+    if (photo && photo.size > 5 * 1024 * 1024) {
+      return new Response(
+        JSON.stringify({ error: 'Photo too large (max 5MB)' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     console.log('Generating content for:', { business, contentType, tone, section, hasPhoto: !!photo });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
