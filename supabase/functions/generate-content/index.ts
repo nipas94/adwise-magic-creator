@@ -65,6 +65,22 @@ serve(async (req) => {
       );
     }
 
+    // Check subscription for weekly content
+    if (contentType === 'weekly') {
+      const { data: subscription, error: subError } = await supabaseClient
+        .from('subscriptions')
+        .select('plan, status')
+        .eq('user_id', user.id)
+        .single();
+
+      if (subError || !subscription || subscription.plan !== 'monthly' || subscription.status !== 'active') {
+        return new Response(
+          JSON.stringify({ error: 'Weekly content requires an active monthly subscription. Please upgrade to access this feature.' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
     console.log('Generating content for:', { business, contentType, tone, section, hasPhoto: !!photo });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
