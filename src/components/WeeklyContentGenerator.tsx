@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Copy, Check, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DayContent {
   day: string;
@@ -34,22 +35,14 @@ export const WeeklyContentGenerator = ({ businessDescription, tone, photoContext
         formData.append('photoContext', photoContext);
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-content`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: formData,
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('generate-content', {
+        body: formData,
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate weekly content');
+      if (error) {
+        throw new Error(error.message || 'Failed to generate weekly content');
       }
 
-      const data = await response.json();
       setWeeklyContent(data.result.weeklyContent || []);
     } catch (error) {
       toast({
