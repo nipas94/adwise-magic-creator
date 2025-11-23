@@ -10,77 +10,17 @@ export const SubscriptionBanner = () => {
   const { toast } = useToast();
 
   const handleUpgrade = async () => {
-    if (!subscription) return;
-
-    try {
-      // Mock upgrade - in production this would integrate with Stripe
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({
-          plan: 'monthly',
-          status: 'active',
-          started_at: new Date().toISOString(),
-          expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-        })
-        .eq('user_id', subscription.user_id);
-
-      if (error) throw error;
-
-      // Update role to paid
-      await supabase
-        .from('user_roles')
-        .update({ role: 'paid' })
-        .eq('user_id', subscription.user_id);
-
-      await refreshSubscription();
-
-      toast({
-        title: "Upgrade Successful! 🎉",
-        description: "You now have access to the Weekly Content Generator!",
-      });
-    } catch (error) {
-      toast({
-        title: "Upgrade failed",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Payment Integration Coming Soon",
+      description: "Secure payment processing will be added soon. Contact support to upgrade.",
+    });
   };
 
   const handleCancel = async () => {
-    if (!subscription) return;
-
-    try {
-      const { error } = await supabase
-        .from('subscriptions')
-        .update({
-          plan: 'free',
-          status: 'active',
-          expires_at: null,
-        })
-        .eq('user_id', subscription.user_id);
-
-      if (error) throw error;
-
-      // Update role to free
-      await supabase
-        .from('user_roles')
-        .update({ role: 'free' })
-        .eq('user_id', subscription.user_id);
-
-      await refreshSubscription();
-
-      toast({
-        title: "Subscription Cancelled",
-        description: "You've been downgraded to the free plan.",
-      });
-    } catch (error) {
-      toast({
-        title: "Cancellation failed",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Contact Support",
+      description: "Please contact support to manage your subscription.",
+    });
   };
 
   if (!subscription) return null;
